@@ -1,0 +1,39 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model User {
+  id                Int       @id @default(autoincrement())
+  name              String
+  email             String    @unique
+  password          String?
+  phone             String?
+  role              Role      @default(USER)
+  verificationToken String?
+  isVerified        Boolean   @default(false)
+  provider          String    @default("credentials")
+  providerId        String?   @unique
+  resetToken        String?
+  resetTokenExpiry  DateTime?
+  isHost            Boolean   @default(false)
+  isHostApproved    Boolean   @default(false)
+
+  host Host?
+}
+
+model Host {
+  id     Int  @id @default(autoincrement())
+  userId Int  @unique
+  user   User @relation(fields: [userId], references: [id])
+
+  businessName String?
+}
