@@ -13,7 +13,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { signIn } from 'next-auth/react';
 
 interface SignupFormProps {
-  initialAccountType?: 'USER' | 'HOST';
+  initialAccountType?: 'USER' | 'HOST' | 'ADMIN';
 }
 
 export default function SignupForm({ initialAccountType = 'USER' }: SignupFormProps) {
@@ -22,7 +22,7 @@ export default function SignupForm({ initialAccountType = 'USER' }: SignupFormPr
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  const [accountType, setAccountType] = useState<'USER' | 'HOST'>(initialAccountType);
+  const [accountType, setAccountType] = useState<'USER' | 'HOST' | 'ADMIN'>(initialAccountType);
   const [businessName, setBusinessName] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -77,7 +77,7 @@ export default function SignupForm({ initialAccountType = 'USER' }: SignupFormPr
         businessName: accountType === 'HOST' ? businessName : undefined,
       });
 
-      router.push(accountType === 'HOST' ? '/host' : '/');
+      router.push(accountType === 'HOST' ? '/host' : accountType === 'ADMIN' ? '/admin' : '/');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create account. Please try again.');
       console.error(err);
@@ -99,7 +99,7 @@ const handleSocialSignup = () => {
       )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="grid grid-cols-2 gap-2 rounded-2xl bg-slate-100 p-1">
+        <div className="grid grid-cols-3 gap-2 rounded-2xl bg-slate-100 p-1">
           <button
             type="button"
             onClick={() => setAccountType('USER')}
@@ -121,6 +121,17 @@ const handleSocialSignup = () => {
             }`}
           >
             Host Account
+          </button>
+          <button
+            type="button"
+            onClick={() => setAccountType('ADMIN')}
+            className={`rounded-2xl px-4 py-3 text-sm font-semibold transition ${
+              accountType === 'ADMIN'
+                ? 'bg-white text-slate-900 shadow-sm'
+                : 'text-slate-500 hover:text-slate-800'
+            }`}
+          >
+            Admin Account
           </button>
         </div>
 
@@ -274,7 +285,7 @@ const handleSocialSignup = () => {
           disabled={loading}
           className="w-full py-3 text-base font-semibold disabled:opacity-60 mt-6"
         >
-          {loading ? 'Creating Account...' : accountType === 'HOST' ? 'Create Host Account' : 'Sign Up'}
+          {loading ? 'Creating Account...' : accountType === 'HOST' ? 'Create Host Account' : accountType === 'ADMIN' ? 'Create Admin Account' : 'Sign Up'}
         </Button>
       </form>
 

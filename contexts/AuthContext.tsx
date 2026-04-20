@@ -19,7 +19,7 @@ interface SignupPayload {
   email: string
   phone: string
   password: string
-  accountType: Extract<AuthRole, "USER" | "HOST">
+  accountType: AuthRole
   businessName?: string
 }
 
@@ -35,7 +35,7 @@ interface StoredAccount extends AuthUser {
 interface AuthContextType {
   user: AuthUser | null
   loading: boolean
-  login: (email: string, password: string, role: AuthRole) => Promise<AuthUser>
+  login: (email: string, password: string) => Promise<AuthUser>
   signup: (payload: SignupPayload) => Promise<AuthUser>
   becomeHost: (payload: BecomeHostPayload) => AuthUser
   logout: () => void
@@ -91,6 +91,18 @@ function sanitizeUser(account: StoredAccount): AuthUser {
   }
 }
 
+function resolvePrimaryRole(role: "USER" | "ADMIN", isHost: boolean): AuthRole {
+  if (role === "ADMIN") {
+    return "ADMIN"
+  }
+
+  if (isHost) {
+    return "HOST"
+  }
+
+  return "USER"
+}
+
 function createAuthUserFromApiUser(apiUser: {
   id: number | string
   email: string
@@ -100,9 +112,9 @@ function createAuthUserFromApiUser(apiUser: {
   businessName?: string | null
   isHost: boolean
 }) {
-  const primaryRole: AuthRole = apiUser.isHost ? "HOST" : apiUser.role
+  const primaryRole = resolvePrimaryRole(apiUser.role, apiUser.isHost)
   const roles = normalizeRoles(
-    apiUser.isHost ? ["USER", "HOST"] : [apiUser.role],
+    [apiUser.role, ...(apiUser.isHost ? ["HOST"] : [])],
     primaryRole,
   )
 
@@ -186,31 +198,25 @@ function persistSession(nextUser: AuthUser | null, setUser: (user: AuthUser | nu
   localStorage.removeItem(SESSION_KEY)
 }
 
-function loginFromLocalAccount(email: string, password: string, role: AuthRole) {
+function loginFromLocalAccount(email: string, password: string) {
   const normalizedEmail = email.trim().toLowerCase()
   const accounts = readAccounts()
   const existingAccount = accounts.find(account => account.email.toLowerCase() === normalizedEmail)
 
   if (!existingAccount) {
-    throw new Error(role === "ADMIN" ? "Admin account not found" : "Account not found. Please sign up first")
+    throw new Error("Account not found. Please sign up first")
   }
 
   if (existingAccount.password !== password) {
     throw new Error("Incorrect email or password")
   }
 
+  const primaryRole = resolvePrimaryRole(
+    existingAccount.roles.includes("ADMIN") || existingAccount.role === "ADMIN" ? "ADMIN" : "USER",
+    existingAccount.roles.includes("HOST") || existingAccount.role === "HOST",
+  )
   const roles = normalizeRoles(existingAccount.roles, existingAccount.role)
-  if (!roles.includes(role)) {
-    throw new Error(
-      role === "HOST"
-        ? "This account does not have host access yet"
-        : role === "ADMIN"
-          ? "This account is not authorized for admin access"
-          : "This account cannot use that login mode"
-    )
-  }
-
-  const nextAccount = hydrateAccount({ ...existingAccount, role, roles })
+  const nextAccount = hydrateAccount({ ...existingAccount, role: primaryRole, roles })
   const nextAccounts = accounts.map(account => (account.id === nextAccount.id ? nextAccount : account))
   writeAccounts(nextAccounts)
   return sanitizeUser(nextAccount)
@@ -273,7 +279,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [])
 
-  const login = async (email: string, password: string, role: AuthRole) => {
+  const login = async (email: string, password: string) => {
     try {
       const response = await fetch("/api/auth/login", {
         method: "POST",
@@ -290,18 +296,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       const nextUser = createAuthUserFromApiUser(payload.user)
-      const allowedRoles = normalizeRoles(nextUser.roles, nextUser.role)
-
-      if (!allowedRoles.includes(role)) {
-        throw new Error(
-          role === "HOST"
-            ? "This account does not have host access yet"
-            : role === "ADMIN"
-              ? "This account is not authorized for admin access"
-              : "This account cannot use that login mode"
-        )
-      }
-
       persistSession(nextUser, setUser)
       return nextUser
     } catch (error) {
@@ -309,7 +303,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         throw error
       }
 
-      const nextUser = loginFromLocalAccount(email, password, role)
+      const nextUser = loginFromLocalAccount(email, password)
       persistSession(nextUser, setUser)
       return nextUser
     }
@@ -326,7 +320,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         email,
         phone,
         password,
-        role: accountType === "HOST" ? "host" : "user",
+        role: accountType === "HOST" ? "host" : accountType === "ADMIN" ? "admin" : "user",
         businessName: accountType === "HOST" ? businessName?.trim() : undefined,
       }),
     })

@@ -27,7 +27,6 @@ export default function LoginForm() {
   const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [accountType, setAccountType] = useState<'USER' | 'HOST' | 'ADMIN'>('USER');
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -49,8 +48,8 @@ export default function LoginForm() {
 
     setLoading(true);
     try {
-      await login(email, password, accountType);
-      router.push(accountType === 'HOST' ? '/host' : accountType === 'ADMIN' ? '/admin' : '/');
+      const user = await login(email, password);
+      router.push(user.role === 'ADMIN' ? '/admin' : user.role === 'HOST' ? '/host' : '/');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to login. Please try again.');
       console.error(err);
@@ -73,40 +72,8 @@ export default function LoginForm() {
       )}
 
       <form onSubmit={handleSubmit} className="space-y-5">
-        <div className="grid grid-cols-3 gap-2 rounded-2xl bg-slate-100 p-1">
-          <button
-            type="button"
-            onClick={() => setAccountType('USER')}
-            className={`rounded-2xl px-4 py-3 text-sm font-semibold transition ${
-              accountType === 'USER'
-                ? 'bg-white text-slate-900 shadow-sm'
-                : 'text-slate-500 hover:text-slate-800'
-            }`}
-          >
-            Traveler Login
-          </button>
-          <button
-            type="button"
-            onClick={() => setAccountType('HOST')}
-            className={`rounded-2xl px-4 py-3 text-sm font-semibold transition ${
-              accountType === 'HOST'
-                ? 'bg-white text-slate-900 shadow-sm'
-                : 'text-slate-500 hover:text-slate-800'
-            }`}
-          >
-            Host Login
-          </button>
-          <button
-            type="button"
-            onClick={() => setAccountType('ADMIN')}
-            className={`rounded-2xl px-4 py-3 text-sm font-semibold transition ${
-              accountType === 'ADMIN'
-                ? 'bg-white text-slate-900 shadow-sm'
-                : 'text-slate-500 hover:text-slate-800'
-            }`}
-          >
-            Admin Login
-          </button>
+        <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
+          Sign in with your email and password. Your account role will be detected automatically.
         </div>
 
         {/* Email Field */}
@@ -180,15 +147,13 @@ export default function LoginForm() {
           disabled={loading}
           className="w-full py-3 text-base font-semibold disabled:opacity-60"
         >
-          {loading ? 'Signing in...' : accountType === 'HOST' ? 'Enter Host Dashboard' : accountType === 'ADMIN' ? 'Enter Admin Panel' : 'Sign In'}
+          {loading ? 'Signing in...' : 'Sign In'}
         </Button>
       </form>
 
-      {accountType === 'ADMIN' && (
-        <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-          Demo admin credentials: <span className="font-semibold">admin@gethotels.com</span> / <span className="font-semibold">Admin@123</span>
-        </div>
-      )}
+      <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+        Demo admin credentials: <span className="font-semibold">admin@gethotels.com</span> / <span className="font-semibold">Admin@123</span>
+      </div>
 
       {/* Divider */}
       <div className="relative my-6">
@@ -213,19 +178,13 @@ export default function LoginForm() {
       {/* Sign Up Link */}
       <div className="text-center">
         <p className="text-slate-600 text-sm">
-          {accountType === 'ADMIN' ? (
-            'Admin accounts are provisioned separately.'
-          ) : (
-            <>
-              Don't have an account?{' '}
-              <Link
-                href={accountType === 'HOST' ? '/signup?type=host' : '/signup'}
-                className="font-semibold text-sky-600 hover:text-sky-700 transition"
-              >
-                {accountType === 'HOST' ? 'Create Host Account' : 'Sign Up'}
-              </Link>
-            </>
-          )}
+          Don&apos;t have an account?{' '}
+          <Link
+            href="/signup"
+            className="font-semibold text-sky-600 hover:text-sky-700 transition"
+          >
+            Sign Up
+          </Link>
         </p>
       </div>
     </div>

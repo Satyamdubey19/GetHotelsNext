@@ -1,6 +1,8 @@
 export type Role = "USER" | "ADMIN"
+export type AuthRole = Role | "HOST"
 
 export type RegisterRole = "user" | "admin" | "host"
+export type LoginRole = AuthRole
 
 export interface RegisterInput{
   name: string
@@ -17,10 +19,15 @@ export interface LoginInput{
 }
 
 export interface UserPayload {
- id: number;
+  id: number;
   role: Role;
   isHost: boolean;
   isHostApproved: boolean;
+}
+
+export interface JwtPayload extends UserPayload {
+  iat?: number;
+  exp?: number;
 }
 
 export interface AuthResponse {

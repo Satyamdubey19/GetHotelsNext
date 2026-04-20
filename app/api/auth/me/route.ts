@@ -1,16 +1,11 @@
 import { prisma } from "@/lib/prisma";
-import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
-
-type TokenPayload = {
-  id: number;
-};
+import { verifyJwt } from "@/lib/jwt";
 
 export async function GET() {
   const token = (await cookies()).get("token")?.value;
-  const jwtSecret = process.env.JWT_SECRET;
 
-  if (!token || !jwtSecret) {
+  if (!token) {
     return new Response(JSON.stringify({ error: "Unauthorized" }), {
       status: 401,
       headers: { "Content-Type": "application/json" },
@@ -18,7 +13,15 @@ export async function GET() {
   }
 
   try {
-    const payload = jwt.verify(token, jwtSecret) as TokenPayload;
+    const payload = verifyJwt(token);
+
+    if (!payload) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
     const user = await prisma.user.findUnique({
       where: { id: payload.id },
       include: { host: true },

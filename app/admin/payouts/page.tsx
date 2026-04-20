@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { CheckCircle2, Clock3, Cog, CreditCard, IndianRupee, Wallet } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import StatCard from '@/components/ui/StatCard';
 import StatusBadge from '@/components/ui/StatusBadge';
@@ -130,39 +131,50 @@ export default function AdminPayoutsPage() {
   };
 
   return (
-    <div className="p-8 bg-gray-50 min-h-screen">
+    <div className="min-h-screen px-4 py-6 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">💸 Payout Management</h1>
-          <p className="text-gray-600">Process and track all host payout requests</p>
+        <div className="mb-8 rounded-[32px] border border-white/70 bg-white/80 p-6 shadow-[0_24px_70px_rgba(15,23,42,0.08)] backdrop-blur-xl">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-start gap-4">
+              <div className="flex h-14 w-14 items-center justify-center rounded-[20px] bg-sky-100 text-sky-700">
+                <Wallet className="h-7 w-7" />
+              </div>
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-sky-700">Finance operations</p>
+                <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">Payout management</h1>
+                <p className="mt-2 text-sm text-slate-600">Handle transfer review, settlement status, and payout exceptions with less friction.</p>
+              </div>
+            </div>
+            <div className="rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-semibold text-slate-700">
+              {stats.totalPending} pending requests
+            </div>
+          </div>
         </div>
 
-        {/* Quick Stats */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <StatCard
             title="Pending Requests"
             value={stats.totalPending}
             color="yellow"
-            icon="⏳"
+            icon={<Clock3 className="h-7 w-7" />}
           />
           <StatCard
             title="Pending Amount"
             value={`₹${(stats.pendingAmount / 100000).toFixed(1)}L`}
             color="orange"
-            icon="💰"
+            icon={<IndianRupee className="h-7 w-7" />}
           />
           <StatCard
             title="Processing"
             value={stats.totalProcessing}
             color="blue"
-            icon="⚙️"
+            icon={<Cog className="h-7 w-7" />}
           />
           <StatCard
             title="Total Completed"
             value={`₹${(stats.totalCompleted / 100000).toFixed(1)}L`}
             color="green"
-            icon="✅"
+            icon={<CheckCircle2 className="h-7 w-7" />}
           />
         </div>
 
@@ -182,17 +194,17 @@ export default function AdminPayoutsPage() {
 
         {/* Payouts Table */}
         {loading ? (
-          <div className="bg-white rounded-lg shadow-md p-12">
+          <div className="rounded-[32px] border border-white/70 bg-white/80 p-12 shadow-[0_24px_70px_rgba(15,23,42,0.08)] backdrop-blur-xl">
             <Spinner message="Loading payouts..." />
           </div>
         ) : filteredPayouts.length === 0 ? (
-          <div className="bg-white rounded-lg shadow-md p-12 text-center">
+          <div className="rounded-[32px] border border-white/70 bg-white/80 p-12 text-center shadow-[0_24px_70px_rgba(15,23,42,0.08)] backdrop-blur-xl">
             <p className="text-xl text-gray-600">No payouts found</p>
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow-md overflow-x-auto">
+          <div className="overflow-x-auto rounded-[32px] border border-white/70 bg-white/80 shadow-[0_24px_70px_rgba(15,23,42,0.08)] backdrop-blur-xl">
             <table className="w-full text-sm">
-              <thead className="bg-gray-100 border-b border-gray-200">
+              <thead className="border-b border-slate-200 bg-slate-50/80">
                 <tr>
                   <th className="px-6 py-4 text-left font-semibold text-gray-900">Host</th>
                   <th className="px-6 py-4 text-left font-semibold text-gray-900">Amount</th>
@@ -205,7 +217,7 @@ export default function AdminPayoutsPage() {
               </thead>
               <tbody className="divide-y divide-gray-200">
                 {filteredPayouts.map((payout) => (
-                  <tr key={payout.id} className="hover:bg-gray-50 transition">
+                  <tr key={payout.id} className="transition hover:bg-slate-50/80">
                     <td className="px-6 py-4">
                       <p className="font-semibold text-gray-900">{payout.hostName}</p>
                     </td>
@@ -215,7 +227,7 @@ export default function AdminPayoutsPage() {
                       </p>
                     </td>
                     <td className="px-6 py-4 text-sm">
-                      <p className="text-gray-900">{payout.bankName}</p>
+                      <p className="inline-flex items-center gap-2 text-gray-900"><CreditCard className="h-4 w-4 text-slate-400" />{payout.bankName}</p>
                       <p className="text-gray-600">****{payout.accountNumber.slice(-4)}</p>
                     </td>
                     <td className="px-6 py-4">
@@ -231,7 +243,7 @@ export default function AdminPayoutsPage() {
                     </td>
                     <td className="px-6 py-4 text-sm font-mono text-gray-600">
                       {payout.transactionId ? (
-                        <span className="bg-green-50 px-2 py-1 rounded text-green-900">
+                        <span className="rounded bg-sky-50 px-2 py-1 text-sky-900">
                           {payout.transactionId}
                         </span>
                       ) : (
@@ -288,7 +300,7 @@ export default function AdminPayoutsPage() {
                   <select
                     value={newStatus}
                     onChange={(e) => setNewStatus(e.target.value as 'processing' | 'completed' | 'failed')}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
                   >
                     <option value="processing">Processing</option>
                     <option value="completed">Completed</option>
@@ -306,7 +318,7 @@ export default function AdminPayoutsPage() {
                       value={transactionId}
                       onChange={(e) => setTransactionId(e.target.value)}
                       placeholder="e.g., TXN123456789"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
                     />
                   </div>
                 )}
@@ -320,7 +332,7 @@ export default function AdminPayoutsPage() {
                       value={failureReason}
                       onChange={(e) => setFailureReason(e.target.value)}
                       placeholder="Explain why the payout failed..."
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600 resize-none"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 resize-none"
                       rows={3}
                     />
                   </div>

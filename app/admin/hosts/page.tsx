@@ -2,11 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { Building2, CheckCircle2, Clock3, IndianRupee, MapPin, Search } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import StatCard from '@/components/ui/StatCard';
 import StatusBadge from '@/components/ui/StatusBadge';
 import Spinner from '@/components/ui/Spinner';
 import FilterTabs from '@/components/ui/FilterTabs';
+import Input from '@/components/ui/Input';
 
 interface Host {
   id: string;
@@ -93,9 +95,6 @@ export default function AdminHostsPage() {
       host.businessName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       host.email.toLowerCase().includes(searchTerm.toLowerCase())
     );
-
-
-
   const stats = {
     totalHosts: hosts.length,
     verifiedHosts: hosts.filter(h => h.isVerified).length,
@@ -104,52 +103,65 @@ export default function AdminHostsPage() {
   };
 
   return (
-    <div className="p-8 bg-gray-50 min-h-screen">
+    <div className="min-h-screen px-4 py-6 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">🏢 Host Management</h1>
-          <p className="text-gray-600">Manage host accounts and verify KYC</p>
+        <div className="mb-8 rounded-[32px] border border-white/70 bg-white/80 p-6 shadow-[0_24px_70px_rgba(15,23,42,0.08)] backdrop-blur-xl">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-start gap-4">
+              <div className="flex h-14 w-14 items-center justify-center rounded-[20px] bg-sky-100 text-sky-700">
+                <Building2 className="h-7 w-7" />
+              </div>
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-sky-700">Partner operations</p>
+                <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">Host management</h1>
+                <p className="mt-2 text-sm text-slate-600">Track verification, revenue concentration, and partner activity from one screen.</p>
+              </div>
+            </div>
+            <div className="rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-semibold text-slate-700">
+              {stats.pendingKYC} pending reviews
+            </div>
+          </div>
         </div>
 
-        {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <StatCard
             title="Total Hosts"
             value={stats.totalHosts}
-            icon="🏢"
+            icon={<Building2 className="h-7 w-7" />}
             color="blue"
           />
           <StatCard
             title="Verified Hosts"
             value={stats.verifiedHosts}
-            icon="✅"
+            icon={<CheckCircle2 className="h-7 w-7" />}
             color="green"
           />
           <StatCard
             title="Pending KYC"
             value={stats.pendingKYC}
-            icon="⏳"
+            icon={<Clock3 className="h-7 w-7" />}
             color="yellow"
             highlight={stats.pendingKYC > 0}
           />
           <StatCard
             title="Total Revenue"
             value={`₹${(stats.totalRevenue / 100000).toFixed(1)}L`}
-            icon="💰"
+            icon={<IndianRupee className="h-7 w-7" />}
             color="purple"
           />
         </div>
 
-        {/* Search & Filter */}
         <div className="mb-6 space-y-4">
-          <input
-            type="text"
-            placeholder="Search by business name or email..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600"
-          />
+          <div className="relative">
+            <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <Input
+              type="text"
+              placeholder="Search by business name or email..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-11"
+            />
+          </div>
 
           <FilterTabs
             tabs={['all', 'verified', 'pending-kyc', 'rejected-kyc'] as const}
@@ -166,17 +178,17 @@ export default function AdminHostsPage() {
 
         {/* Hosts Table */}
         {loading ? (
-          <div className="bg-white rounded-lg shadow-md p-12">
+          <div className="rounded-[32px] border border-white/70 bg-white/80 p-12 shadow-[0_24px_70px_rgba(15,23,42,0.08)] backdrop-blur-xl">
             <Spinner message="Loading hosts..." />
           </div>
         ) : filteredHosts.length === 0 ? (
-          <div className="bg-white rounded-lg shadow-md p-12 text-center">
+          <div className="rounded-[32px] border border-white/70 bg-white/80 p-12 text-center shadow-[0_24px_70px_rgba(15,23,42,0.08)] backdrop-blur-xl">
             <p className="text-xl text-gray-600">No hosts found</p>
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow-md overflow-x-auto">
+          <div className="overflow-x-auto rounded-[32px] border border-white/70 bg-white/80 shadow-[0_24px_70px_rgba(15,23,42,0.08)] backdrop-blur-xl">
             <table className="w-full text-sm">
-              <thead className="bg-gray-100 border-b border-gray-200">
+              <thead className="border-b border-slate-200 bg-slate-50/80">
                 <tr>
                   <th className="px-6 py-4 text-left font-semibold text-gray-900">Business</th>
                   <th className="px-6 py-4 text-left font-semibold text-gray-900">Contact</th>
@@ -190,7 +202,7 @@ export default function AdminHostsPage() {
               </thead>
               <tbody className="divide-y divide-gray-200">
                 {filteredHosts.map((host) => (
-                  <tr key={host.id} className="hover:bg-gray-50 transition">
+                  <tr key={host.id} className="transition hover:bg-slate-50/80">
                     <td className="px-6 py-4">
                       <p className="font-semibold text-gray-900">{host.businessName}</p>
                       <p className="text-xs text-gray-500">{host.email}</p>
@@ -199,7 +211,10 @@ export default function AdminHostsPage() {
                       {host.phone}
                     </td>
                     <td className="px-6 py-4 text-gray-600">
-                      📍 {host.city}
+                      <span className="inline-flex items-center gap-2">
+                        <MapPin className="h-4 w-4 text-slate-400" />
+                        {host.city}
+                      </span>
                     </td>
                     <td className="px-6 py-4 font-semibold text-gray-900">
                       {host.totalProperties}
@@ -207,7 +222,7 @@ export default function AdminHostsPage() {
                     <td className="px-6 py-4 font-semibold text-gray-900">
                       {host.totalBookings}
                     </td>
-                    <td className="px-6 py-4 font-bold text-green-600">
+                    <td className="px-6 py-4 font-bold text-sky-700">
                       ₹{(host.revenue / 100000).toFixed(1)}L
                     </td>
                     <td className="px-6 py-4">

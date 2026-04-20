@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { CalendarClock } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import StatusBadge from '@/components/ui/StatusBadge';
 import Spinner from '@/components/ui/Spinner';
@@ -119,12 +120,24 @@ export default function AdminBookingsPage() {
   };
 
   return (
-    <div className="p-8 bg-gray-50 min-h-screen">
+    <div className="min-h-screen px-4 py-6 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">📋 All Bookings</h1>
-          <p className="text-gray-600">Manage and override all platform bookings</p>
+        <div className="mb-8 rounded-[32px] border border-white/70 bg-white/80 p-6 shadow-[0_24px_70px_rgba(15,23,42,0.08)] backdrop-blur-xl">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-start gap-4">
+              <div className="flex h-14 w-14 items-center justify-center rounded-[20px] bg-sky-100 text-sky-700">
+                <CalendarClock className="h-7 w-7" />
+              </div>
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-sky-700">Operations oversight</p>
+                <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">All bookings</h1>
+                <p className="mt-2 text-sm text-slate-600">Manage booking status changes and admin overrides from a single queue.</p>
+              </div>
+            </div>
+            <div className="rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-semibold text-slate-700">
+              {filteredBookings.length} visible bookings
+            </div>
+          </div>
         </div>
 
         {/* Filter Tabs */}
@@ -143,17 +156,17 @@ export default function AdminBookingsPage() {
 
         {/* Bookings Table */}
         {loading ? (
-          <div className="bg-white rounded-lg shadow-md p-12">
+          <div className="rounded-[32px] border border-white/70 bg-white/80 p-12 shadow-[0_24px_70px_rgba(15,23,42,0.08)] backdrop-blur-xl">
             <Spinner message="Loading bookings..." />
           </div>
         ) : filteredBookings.length === 0 ? (
-          <div className="bg-white rounded-lg shadow-md p-12 text-center">
+          <div className="rounded-[32px] border border-white/70 bg-white/80 p-12 text-center shadow-[0_24px_70px_rgba(15,23,42,0.08)] backdrop-blur-xl">
             <p className="text-xl text-gray-600">No bookings found</p>
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow-md overflow-x-auto">
+          <div className="overflow-x-auto rounded-[32px] border border-white/70 bg-white/80 shadow-[0_24px_70px_rgba(15,23,42,0.08)] backdrop-blur-xl">
             <table className="w-full text-sm">
-              <thead className="bg-gray-100 border-b border-gray-200">
+              <thead className="border-b border-slate-200 bg-slate-50/80">
                 <tr>
                   <th className="px-6 py-4 text-left font-semibold text-gray-900">Guest</th>
                   <th className="px-6 py-4 text-left font-semibold text-gray-900">Property</th>
@@ -166,7 +179,7 @@ export default function AdminBookingsPage() {
               </thead>
               <tbody className="divide-y divide-gray-200">
                 {filteredBookings.map((booking) => (
-                  <tr key={booking.id} className="hover:bg-gray-50 transition">
+                  <tr key={booking.id} className="transition hover:bg-slate-50/80">
                     <td className="px-6 py-4">
                       <div>
                         <p className="font-semibold text-gray-900">{booking.guestName}</p>
@@ -179,7 +192,7 @@ export default function AdminBookingsPage() {
                           {booking.hotelName || booking.tourName || '-'}
                         </p>
                         {booking.isOverridden && (
-                          <p className="text-xs text-red-600 font-medium">⚠️ Overridden by admin</p>
+                          <p className="text-xs font-medium text-sky-700">Overridden by admin</p>
                         )}
                       </div>
                     </td>
@@ -215,7 +228,7 @@ export default function AdminBookingsPage() {
                     <td className="px-6 py-4">
                       <button
                         onClick={() => handleOverrideClick(booking)}
-                        className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded text-xs font-medium transition-colors"
+                        className="rounded px-3 py-1 text-xs font-medium text-white transition-colors bg-sky-600 hover:bg-sky-700"
                       >
                         Override
                       </button>
@@ -237,14 +250,14 @@ export default function AdminBookingsPage() {
           {selectedBooking && (
             <>
 
-              <div className="bg-blue-50 border border-blue-200 rounded p-3 mb-4 text-sm">
-                <p className="text-blue-900">
+              <div className="mb-4 rounded border border-sky-200 bg-sky-50 p-3 text-sm">
+                <p className="text-sky-900">
                   <strong>Guest:</strong> {selectedBooking.guestName}
                 </p>
-                <p className="text-blue-900">
+                <p className="text-sky-900">
                   <strong>Property:</strong> {selectedBooking.hotelName || selectedBooking.tourName}
                 </p>
-                <p className="text-blue-900">
+                <p className="text-sky-900">
                   <strong>Current Status:</strong> {selectedBooking.status.toUpperCase()}
                 </p>
               </div>
@@ -257,7 +270,7 @@ export default function AdminBookingsPage() {
                   <select
                     value={newStatus}
                     onChange={(e) => setNewStatus(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
                   >
                     <option value="pending">Pending</option>
                     <option value="confirmed">Confirmed</option>
@@ -274,7 +287,7 @@ export default function AdminBookingsPage() {
                     value={overrideReason}
                     onChange={(e) => setOverrideReason(e.target.value)}
                     placeholder="Explain why you're overriding this booking..."
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600 resize-none"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 resize-none"
                     rows={4}
                   />
                 </div>
@@ -291,7 +304,7 @@ export default function AdminBookingsPage() {
                 <button
                   onClick={handleSubmitOverride}
                   disabled={overriding || !newStatus || !overrideReason.trim()}
-                  className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50"
+                  className="flex-1 rounded-lg bg-sky-600 px-4 py-2 font-medium text-white transition-colors hover:bg-sky-700 disabled:opacity-50"
                 >
                   {overriding ? 'Overriding...' : 'Override Booking'}
                 </button>

@@ -19,37 +19,66 @@ async function main() {
       bcrypt.hash("Admin@123", 10),
     ])
 
-    // Create sample users
-    const user1 = await prisma.user.create({
-      data: {
+    // Keep demo accounts reusable across seed runs and ensure they can log in immediately.
+    const user1 = await prisma.user.upsert({
+      where: { email: "john@example.com" },
+      update: {
+        name: "John Doe",
+        password: johnPassword,
+        isVerified: true,
+      },
+      create: {
         email: "john@example.com",
         name: "John Doe",
         password: johnPassword,
+        isVerified: true,
       },
     })
 
-    const user2 = await prisma.user.create({
-      data: {
+    const user2 = await prisma.user.upsert({
+      where: { email: "jane@example.com" },
+      update: {
+        name: "Jane Smith",
+        password: janePassword,
+        isVerified: true,
+      },
+      create: {
         email: "jane@example.com",
         name: "Jane Smith",
         password: janePassword,
+        isVerified: true,
       },
     })
 
-    const user3 = await prisma.user.create({
-      data: {
+    const user3 = await prisma.user.upsert({
+      where: { email: "bob@example.com" },
+      update: {
+        name: "Bob Johnson",
+        password: bobPassword,
+        isVerified: true,
+      },
+      create: {
         email: "bob@example.com",
         name: "Bob Johnson",
         password: bobPassword,
+        isVerified: true,
       },
     })
 
-    const adminUser = await prisma.user.create({
-      data: {
+    const adminUser = await prisma.user.upsert({
+      where: { email: "admin@gethotels.com" },
+      update: {
+        name: "GetHotels Admin",
+        password: adminPassword,
+        role: "ADMIN",
+        isVerified: true,
+      },
+      create: {
         email: "admin@gethotels.com",
         name: "GetHotels Admin",
         password: adminPassword,
         role: "ADMIN",
+        isVerified: true,
       },
     })
 

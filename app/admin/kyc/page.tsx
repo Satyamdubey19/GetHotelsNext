@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
+import { Clock3, ShieldCheck } from 'lucide-react'
 import BackLink from "@/components/ui/BackLink"
 import StatusBadge from "@/components/ui/StatusBadge"
 import Spinner from "@/components/ui/Spinner"
@@ -118,18 +119,35 @@ export default function AdminKYCPage() {
   if (loading) return <Spinner minimal />
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-100 p-4">
+    <div className="min-h-screen px-4 py-6 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        <BackLink href="/admin" label="Back to Admin" className="text-purple-600" />
+        <BackLink href="/admin" label="Back to Admin" className="text-sky-700" />
 
-        <h1 className="text-4xl font-bold text-slate-900 mb-8">KYC Management</h1>
+        <div className="mb-8 mt-4 rounded-[32px] border border-white/70 bg-white/80 p-6 shadow-[0_24px_70px_rgba(15,23,42,0.08)] backdrop-blur-xl">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-start gap-4">
+              <div className="flex h-14 w-14 items-center justify-center rounded-[20px] bg-sky-100 text-sky-700">
+                <ShieldCheck className="h-7 w-7" />
+              </div>
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-sky-700">Compliance review</p>
+                <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">KYC management</h1>
+                <p className="mt-2 text-sm text-slate-600">Review host documents, approve clean records, and resolve exceptions quickly.</p>
+              </div>
+            </div>
+            <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-semibold text-slate-700">
+              <Clock3 className="h-4 w-4" />
+              {applications.length} applications
+            </div>
+          </div>
+        </div>
 
         {/* Filter */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+        <div className="mb-8 rounded-[32px] border border-white/70 bg-white/80 p-6 shadow-[0_24px_70px_rgba(15,23,42,0.08)] backdrop-blur-xl">
           <select
             value={filterStatus}
             onChange={e => setFilterStatus(e.target.value)}
-            className="px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+            className="rounded-2xl border border-slate-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-sky-500"
           >
             <option value="PENDING">Pending</option>
             <option value="APPROVED">Approved</option>
@@ -140,13 +158,13 @@ export default function AdminKYCPage() {
 
         {/* Applications List */}
         {applications.length === 0 ? (
-          <div className="bg-white rounded-lg shadow-md p-8 text-center">
+          <div className="rounded-[32px] border border-white/70 bg-white/80 p-8 text-center shadow-[0_24px_70px_rgba(15,23,42,0.08)] backdrop-blur-xl">
             <p className="text-slate-500">No {filterStatus.toLowerCase()} applications</p>
           </div>
         ) : (
           <div className="space-y-4">
             {applications.map(app => (
-              <div key={app.id} className="bg-white rounded-lg shadow-md p-6">
+              <div key={app.id} className="rounded-[28px] border border-white/70 bg-white/80 p-6 shadow-[0_24px_70px_rgba(15,23,42,0.08)] backdrop-blur-xl">
                 <div className="flex justify-between items-start mb-4">
                   <div>
                     <h3 className="text-lg font-bold text-slate-900">
@@ -178,14 +196,14 @@ export default function AdminKYCPage() {
                 </div>
 
                 {app.rejectionReason && (
-                  <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded">
-                    <p className="text-sm text-red-800"><strong>Rejection Reason:</strong> {app.rejectionReason}</p>
+                  <div className="mb-4 rounded border border-sky-200 bg-sky-50 p-3">
+                    <p className="text-sm text-sky-900"><strong>Rejection Reason:</strong> {app.rejectionReason}</p>
                   </div>
                 )}
 
                 <button
                   onClick={() => setSelectedApp(app)}
-                  className="text-blue-600 hover:underline font-semibold"
+                  className="font-semibold text-sky-700 hover:underline"
                 >
                   View Details & Documents
                 </button>
@@ -226,7 +244,7 @@ export default function AdminKYCPage() {
                       value={rejectionReason}
                       onChange={e => setRejectionReason(e.target.value)}
                       rows={3}
-                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
                       placeholder="Enter rejection reason..."
                     />
                   </div>
@@ -235,14 +253,14 @@ export default function AdminKYCPage() {
                     <button
                       onClick={() => handleApprove(selectedApp.id)}
                       disabled={processing}
-                      className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-slate-400 text-white py-2 rounded-lg font-semibold"
+                      className="flex-1 rounded-lg bg-sky-600 py-2 font-semibold text-white hover:bg-sky-700 disabled:bg-slate-400"
                     >
                       {processing ? "Processing..." : "✓ Approve"}
                     </button>
                     <button
                       onClick={() => handleReject(selectedApp.id)}
                       disabled={processing || !rejectionReason.trim()}
-                      className="flex-1 bg-red-600 hover:bg-red-700 disabled:bg-slate-400 text-white py-2 rounded-lg font-semibold"
+                      className="flex-1 rounded-lg bg-slate-800 py-2 font-semibold text-white hover:bg-slate-900 disabled:bg-slate-400"
                     >
                       {processing ? "Processing..." : "✗ Reject"}
                     </button>

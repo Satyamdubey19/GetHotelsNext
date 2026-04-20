@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { Building2, ShieldCheck, UserRound, Users } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import StatCard from '@/components/ui/StatCard';
 import StatusBadge from '@/components/ui/StatusBadge';
@@ -77,60 +78,67 @@ export default function AdminUsersPage() {
   const filteredUsers = filter === 'all' 
     ? users 
     : users.filter(u => u.role === filter);
-
-
-
   const getRoleIcon = (role: string) => {
     switch (role) {
       case 'USER':
-        return '👤';
+        return <UserRound className="h-5 w-5" />;
       case 'HOST':
-        return '🏢';
+        return <Building2 className="h-5 w-5" />;
       case 'ADMIN':
-        return '👨‍💼';
+        return <ShieldCheck className="h-5 w-5" />;
       default:
-        return '❓';
+        return <Users className="h-5 w-5" />;
     }
   };
 
   return (
-    <div className="p-8 bg-gray-50 min-h-screen">
+    <div className="min-h-screen px-4 py-6 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">👥 User Management</h1>
-          <p className="text-gray-600">Manage all platform users</p>
+        <div className="mb-8 rounded-[32px] border border-white/70 bg-white/80 p-6 shadow-[0_24px_70px_rgba(15,23,42,0.08)] backdrop-blur-xl">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-start gap-4">
+              <div className="flex h-14 w-14 items-center justify-center rounded-[20px] bg-sky-100 text-sky-700">
+                <Users className="h-7 w-7" />
+              </div>
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-sky-700">Administration</p>
+                <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">User management</h1>
+                <p className="mt-2 text-sm text-slate-600">Review account types, growth mix, and active user health from one table.</p>
+              </div>
+            </div>
+            <div className="rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-semibold text-slate-700">
+              {users.length} total accounts
+            </div>
+          </div>
         </div>
 
-        {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <StatCard
             title="Total Users"
             value={users.filter(u => u.role === 'USER').length}
-            icon="👤"
+            icon={<UserRound className="h-7 w-7" />}
             color="blue"
           />
           <StatCard
             title="Total Hosts"
             value={users.filter(u => u.role === 'HOST').length}
-            icon="🏢"
+            icon={<Building2 className="h-7 w-7" />}
             color="green"
           />
           <StatCard
             title="Admins"
             value={users.filter(u => u.role === 'ADMIN').length}
-            icon="👨‍💼"
+            icon={<ShieldCheck className="h-7 w-7" />}
             color="red"
           />
           <StatCard
             title="Active Users"
             value={users.filter(u => u.isActive).length}
-            icon="✅"
+            icon={<Users className="h-7 w-7" />}
             color="purple"
           />
         </div>
 
-        {/* Filter Tabs */}
         <div className="mb-6">
           <FilterTabs
             tabs={['all', 'USER', 'HOST', 'ADMIN'] as const}
@@ -144,17 +152,17 @@ export default function AdminUsersPage() {
 
         {/* Users Table */}
         {loading ? (
-          <div className="bg-white rounded-lg shadow-md p-12">
+          <div className="rounded-[32px] border border-white/70 bg-white/80 p-12 shadow-[0_24px_70px_rgba(15,23,42,0.08)] backdrop-blur-xl">
             <Spinner message="Loading users..." />
           </div>
         ) : filteredUsers.length === 0 ? (
-          <div className="bg-white rounded-lg shadow-md p-12 text-center">
+          <div className="rounded-[32px] border border-white/70 bg-white/80 p-12 text-center shadow-[0_24px_70px_rgba(15,23,42,0.08)] backdrop-blur-xl">
             <p className="text-xl text-gray-600">No users found</p>
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow-md overflow-x-auto">
+          <div className="overflow-x-auto rounded-[32px] border border-white/70 bg-white/80 shadow-[0_24px_70px_rgba(15,23,42,0.08)] backdrop-blur-xl">
             <table className="w-full text-sm">
-              <thead className="bg-gray-100 border-b border-gray-200">
+              <thead className="border-b border-slate-200 bg-slate-50/80">
                 <tr>
                   <th className="px-6 py-4 text-left font-semibold text-gray-900">User</th>
                   <th className="px-6 py-4 text-left font-semibold text-gray-900">Email</th>
@@ -166,10 +174,12 @@ export default function AdminUsersPage() {
               </thead>
               <tbody className="divide-y divide-gray-200">
                 {filteredUsers.map((user) => (
-                  <tr key={user.id} className="hover:bg-gray-50 transition">
+                  <tr key={user.id} className="transition hover:bg-slate-50/80">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <span className="text-2xl">{getRoleIcon(user.role)}</span>
+                        <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-100 text-slate-700">
+                          {getRoleIcon(user.role)}
+                        </div>
                         <p className="font-semibold text-gray-900">{user.name}</p>
                       </div>
                     </td>

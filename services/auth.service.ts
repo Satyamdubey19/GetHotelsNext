@@ -1,9 +1,9 @@
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
 import { prisma } from "@/lib/prisma";
 import { AuthResponse, LoginInput, RegisterInput } from "@/types/auth";
 import crypto from "crypto";
 import { resend } from "@/lib/mail";
+import { signJwt } from "@/lib/jwt";
 type RegisterUserResult = AuthResponse;
 
 const mailFrom = process.env.RESEND_FROM_EMAIL ?? "onboarding@resend.dev";
@@ -45,16 +45,6 @@ type LoginUserRecord = {
   isHostApproved: boolean;
 };
 
-function getJwtSecret() {
-  const jwtSecret = process.env.JWT_SECRET;
-
-  if (!jwtSecret) {
-    throw new Error("JWT_SECRET is not configured");
-  }
-
-  return jwtSecret;
-}
-
 function buildAuthResponse(user: {
   id: number;
   name: string;
@@ -87,12 +77,6 @@ export const registerUser = async (
   const normalizedRole = role === "admin" ? "ADMIN" : "USER";
   const wantsHostAccess = role === "host";
   const verifyToken = crypto.randomBytes(32).toString("hex");
-   console.log("Registering user with data:", {
-    name,
-    email: normalizedEmail,
-    role: normalizedRole,
-    verifyToken,
-  });
   const existingUser = await prisma.user.findUnique({
     where: { email: normalizedEmail },
   });
@@ -140,7 +124,6 @@ export const registerUser = async (
 export const LoginUser=async(data:LoginInput):Promise<AuthResponse&{token:string}>=>{
   const {email,password}=data
   const normalizedEmail = email.trim().toLowerCase();
-  const jwtSecret = getJwtSecret();
   const user = await prisma.user.findUnique({ where: { email: normalizedEmail } }) as LoginUserRecord | null;
   if(!user){
     throw new Error("User not found");
@@ -156,15 +139,13 @@ export const LoginUser=async(data:LoginInput):Promise<AuthResponse&{token:string
     throw new Error("Invalid password");
   }
   
-  const token=jwt.sign(
+  const token=signJwt(
     {
       id:user.id,
       role:user.role,
       isHost:user.isHost,
       isHostApproved:user.isHostApproved,
     },
-    jwtSecret,
-    {expiresIn:"7d"}
   );
 
   return{
@@ -220,7 +201,7 @@ export const RequestResetPassword=async(email:string)=>{
 
 
 export const ResetPassword=async(token:string,newPassword:string)=>{
-  const user = await (prisma.user as any).findFirst({
+  const user = await prisma.user.findFirst({
     where: { resetToken: token, resetTokenExpiry: { gt: new Date() } },
   }) as LoginUserRecord | null;
 
