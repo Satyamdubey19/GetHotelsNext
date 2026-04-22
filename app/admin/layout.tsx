@@ -19,6 +19,7 @@ import {
   Users,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { AppShellSkeleton } from '@/components/ui/loading-skeletons';
 
 type NavItem = {
   href: string;
@@ -93,7 +94,7 @@ export default function AdminLayout({
   }, [loading, router, user]);
 
   if (loading || !user) {
-    return null;
+    return <AppShellSkeleton />;
   }
 
   if (!isAdmin) {

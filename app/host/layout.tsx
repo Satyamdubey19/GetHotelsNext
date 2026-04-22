@@ -5,6 +5,7 @@ import Link from "next/link"
 import { useEffect, useState } from "react"
 import { usePathname, useRouter } from "next/navigation"
 import { useAuth } from "@/contexts/AuthContext"
+import { AppShellSkeleton } from "@/components/ui/loading-skeletons"
 
 export default function HostLayout({
   children,
@@ -32,7 +33,7 @@ export default function HostLayout({
   }, [user?.businessName, user?.phone])
 
   if (loading || !user) {
-    return null
+    return <AppShellSkeleton />
   }
 
   const handleActivateHost = async () => {

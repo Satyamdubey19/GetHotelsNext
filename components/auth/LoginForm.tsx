@@ -131,7 +131,7 @@ export default function LoginForm() {
             id="rememberMe"
             label="Remember me"
             checked={rememberMe}
-            onChange={(e) => setRememberMe(e.target.checked)}
+            onCheckedChange={(checked) => setRememberMe(checked === true)}
           />
           <Link
             href="/forgot-password"

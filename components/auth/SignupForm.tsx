@@ -276,7 +276,7 @@ const handleSocialSignup = () => {
             </>
           }
           checked={agreeTerms}
-          onChange={(e) => setAgreeTerms(e.target.checked)}
+          onCheckedChange={(checked) => setAgreeTerms(checked === true)}
         />
 
         {/* Submit Button */}

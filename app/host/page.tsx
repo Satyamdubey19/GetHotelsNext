@@ -3,8 +3,8 @@
 import type { ReactNode } from "react"
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import Spinner from "@/components/ui/Spinner"
 import { useAuth } from "@/contexts/AuthContext"
+import { HostDashboardSkeleton } from "@/components/ui/loading-skeletons"
 
 type PropertyType = "hotel" | "tour"
 
@@ -167,7 +167,7 @@ export default function HostDashboard() {
     }
   }
 
-  if (loading) return <Spinner minimal />
+  if (loading) return <HostDashboardSkeleton />
 
   const allListings = [...hotels, ...tours]
   const hostName = user?.businessName || user?.name || "Host"

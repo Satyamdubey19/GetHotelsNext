@@ -23,7 +23,7 @@ import {
 import { useAuth } from '@/contexts/AuthContext';
 import StatCard from '@/components/ui/StatCard';
 import StatusBadge from '@/components/ui/StatusBadge';
-import Spinner from '@/components/ui/Spinner';
+import { AdminDashboardSkeleton } from '@/components/ui/loading-skeletons';
 
 interface DashboardStats {
   totalUsers: number;
@@ -138,11 +138,7 @@ export default function AdminDashboard() {
   };
 
   if (loading || !stats) {
-    return (
-      <div className="px-4 py-10 sm:px-6 lg:px-8">
-        <Spinner message="Loading dashboard..." fullPage />
-      </div>
-    );
+    return <AdminDashboardSkeleton />;
   }
 
   const approvalRate = Math.round((stats.approvedKYC / Math.max(stats.approvedKYC + stats.pendingKYC + stats.rejectedKYC, 1)) * 100);

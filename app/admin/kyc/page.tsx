@@ -6,6 +6,7 @@ import { Clock3, ShieldCheck } from 'lucide-react'
 import BackLink from "@/components/ui/BackLink"
 import StatusBadge from "@/components/ui/StatusBadge"
 import Spinner from "@/components/ui/Spinner"
+import { TablePageSkeleton } from "@/components/ui/loading-skeletons"
 import Modal from "@/components/ui/Modal"
 
 interface KYCApplication {
@@ -116,7 +117,7 @@ export default function AdminKYCPage() {
     }
   }
 
-  if (loading) return <Spinner minimal />
+  if (loading) return <TablePageSkeleton />
 
   return (
     <div className="min-h-screen px-4 py-6 sm:px-6 lg:px-8">

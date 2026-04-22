@@ -7,6 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import StatCard from '@/components/ui/StatCard';
 import StatusBadge from '@/components/ui/StatusBadge';
 import Spinner from '@/components/ui/Spinner';
+import { TablePageSkeleton } from '@/components/ui/loading-skeletons';
 import FilterTabs from '@/components/ui/FilterTabs';
 import Input from '@/components/ui/Input';
 
@@ -178,9 +179,7 @@ export default function AdminHostsPage() {
 
         {/* Hosts Table */}
         {loading ? (
-          <div className="rounded-[32px] border border-white/70 bg-white/80 p-12 shadow-[0_24px_70px_rgba(15,23,42,0.08)] backdrop-blur-xl">
-            <Spinner message="Loading hosts..." />
-          </div>
+          <TablePageSkeleton />
         ) : filteredHosts.length === 0 ? (
           <div className="rounded-[32px] border border-white/70 bg-white/80 p-12 text-center shadow-[0_24px_70px_rgba(15,23,42,0.08)] backdrop-blur-xl">
             <p className="text-xl text-gray-600">No hosts found</p>
